@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "160728195462",
+    "project_id": "domino-kingdom-91ac3",
+    "storage_bucket": "domino-kingdom-91ac3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:160728195462:android:a44d6ee6b55f6a1921cc07",
+        "android_client_info": {
+          "package_name": "com.udistrital.domino"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGrTmkwXCkPJ368iSS8jHpYcID1-BOXO4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
