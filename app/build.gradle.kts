@@ -47,6 +47,10 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    // ViewModel + corrutinas (viewModelScope, StateFlow) para la lógica de juego
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.11.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
     // Firebase BOM (Mantiene todas las versiones de Firebase sincronizadas)
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
 
