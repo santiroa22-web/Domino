@@ -59,6 +59,15 @@ dependencies {
 
     // Base de datos en tiempo real para las partidas
     implementation("com.google.firebase:firebase-firestore-ktx")
+
+    // .await() sobre las Task de Firebase dentro de corrutinas
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+
+    // Login con Google mediante Credential Manager (reemplaza a GoogleSignInClient)
+    implementation("androidx.credentials:credentials:1.5.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
