@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -108,6 +109,7 @@ fun AppNavegacion(
     historialViewModel: HistorialViewModel
 ) {
     val navController = rememberNavController()
+    val context = LocalContext.current
 
     // Si Firebase ya tiene una sesión guardada, se entra directo al Lobby.
     val usuarioGuardado = remember { inicioViewModel.usuarioActual }
@@ -146,6 +148,9 @@ fun AppNavegacion(
                 onContrasenaChange = { loginViewModel.onContrasenaChange(it) },
                 onIniciarSesionClick = {
                     loginViewModel.iniciarSesion(irAlLobby)
+                },
+                onGoogleClick = {
+                    loginViewModel.iniciarSesionConGoogle(context, irAlLobby)
                 },
                 onVolverInicioClick = { navController.popBackStack() },
                 onIrARegistroClick = {

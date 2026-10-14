@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -52,7 +53,8 @@ fun LoginScreen(
     onContrasenaChange: (String) -> Unit = {},
     onIniciarSesionClick: () -> Unit = {},
     onVolverInicioClick: () -> Unit = {},
-    onIrARegistroClick: () -> Unit = {}
+    onIrARegistroClick: () -> Unit = {},
+    onGoogleClick: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -147,6 +149,12 @@ fun LoginScreen(
                         texto = "ENTRAR",
                         onClick = onIniciarSesionClick
                     )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text("o", color = BlancoSuave.copy(alpha = 0.7f), fontSize = 13.sp)
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    BotonGoogle(onClick = onGoogleClick, habilitado = !state.cargando)
                 }
             }
 
@@ -204,4 +212,22 @@ fun CampoTextoCustom(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth()
     )
+}
+/** Botón reutilizable "Continuar con Google" (mockup de Login). */
+@Composable
+fun BotonGoogle(onClick: () -> Unit, habilitado: Boolean = true) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.White)
+            .clickable(enabled = habilitado) { onClick() }
+            .padding(vertical = 14.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text("G", color = Color(0xFF4285F4), fontSize = 20.sp, fontWeight = FontWeight.Black)
+        Spacer(modifier = Modifier.width(10.dp))
+        Text("Continuar con Google", color = Color(0xFF3C4043), fontSize = 15.sp, fontWeight = FontWeight.Bold)
+    }
 }
