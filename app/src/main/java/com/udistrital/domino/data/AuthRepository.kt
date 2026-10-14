@@ -19,6 +19,9 @@ interface AuthRepository {
     suspend fun iniciarSesion(correo: String, contrasena: String): ResultadoAuth
     suspend fun registrar(nombre: String, correo: String, contrasena: String): ResultadoAuth
     suspend fun entrarComoInvitado(): ResultadoAuth
+    /** Login con el idToken de Google. Solo lo implementa la versión Firebase. */
+    suspend fun iniciarSesionConGoogle(idToken: String): ResultadoAuth =
+        ResultadoAuth.Error("Login con Google no disponible en modo local")
     fun cerrarSesion()
 }
 

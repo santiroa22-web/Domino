@@ -61,7 +61,7 @@ class AuthFirebaseRepository(
      * Login con Google. El idToken lo obtiene la UI con Credential Manager
      * (ver GoogleSignInHelper.kt) porque necesita un Context de Activity.
      */
-    suspend fun iniciarSesionConGoogle(idToken: String): ResultadoAuth = ejecutar {
+    override suspend fun iniciarSesionConGoogle(idToken: String): ResultadoAuth = ejecutar {
         val credencial = GoogleAuthProvider.getCredential(idToken, null)
         val user = auth.signInWithCredential(credencial).await().user!!
         guardarPerfil(user.uid, user.displayName ?: "Jugador", user.email.orEmpty(), user.photoUrl?.toString())

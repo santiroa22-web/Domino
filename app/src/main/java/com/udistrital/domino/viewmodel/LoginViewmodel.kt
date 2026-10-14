@@ -1,5 +1,6 @@
 package com.udistrital.domino.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.udistrital.domino.data.AuthFirebaseRepository
 import com.udistrital.domino.data.AuthRepository
+import com.udistrital.domino.data.GoogleSignInHelper
 import com.udistrital.domino.data.ResultadoAuth
 import com.udistrital.domino.data.Usuario
 import com.udistrital.domino.model.EstadoLoginUI
@@ -40,6 +42,19 @@ class LoginViewModel(
         uiState = uiState.copy(cargando = true, mensajeError = null)
         viewModelScope.launch {
             manejar(auth.iniciarSesion(uiState.correo, uiState.contrasena), onExito)
+        }
+    }
+
+    /** Botón "Continuar con Google": pide la cuenta y abre sesión en Firebase. */
+    fun iniciarSesionConGoogle(activityContext: Context, onExito: (Usuario) -> Unit) {
+        if (uiState.cargando) return
+        uiState = uiState.copy(cargando = true, mensajeError = null)
+        viewModelScope.launch {
+            when (val g = GoogleSignInHelper.obtenerIdToken(activityContext)) {
+                is GoogleSignInHelper.Resultado.Token -> manejar(auth.iniciarSesionConGoogle(g.idToken), onExito)
+                is GoogleSignInHelper.Resultado.Error -> uiState = uiState.copy(cargando = false, mensajeError = g.mensaje)
+                GoogleSignInHelper.Resultado.Cancelado -> uiState = uiState.copy(cargando = false)
+            }
         }
     }
 
