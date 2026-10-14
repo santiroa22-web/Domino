@@ -289,6 +289,7 @@ fun AppNavegacion(
 
         // 9. HISTORIAL
         composable(Rutas.HISTORIAL) {
+            LaunchedEffect(Unit) { historialViewModel.cargar() }
             HistorialScreen(
                 partidas = historialViewModel.partidas,
                 onVolver = { navController.popBackStack() }
