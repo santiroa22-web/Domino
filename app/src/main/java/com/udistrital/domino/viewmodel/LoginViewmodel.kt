@@ -4,9 +4,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.udistrital.domino.data.AuthFirebaseRepository
+import com.udistrital.domino.data.AuthRepository
+import com.udistrital.domino.data.ResultadoAuth
+import com.udistrital.domino.data.Usuario
 import com.udistrital.domino.model.EstadoLoginUI
+import kotlinx.coroutines.launch
 
-class LoginViewModel : ViewModel() {
+/**
+ * ViewModel del Login. Valida el formulario y delega la autenticación en el
+ * [AuthRepository] (Firebase Auth). La pantalla solo pinta [uiState].
+ */
+class LoginViewModel(
+    private val auth: AuthRepository = AuthFirebaseRepository()
+) : ViewModel() {
 
     var uiState by mutableStateOf(EstadoLoginUI())
         private set
@@ -19,13 +31,26 @@ class LoginViewModel : ViewModel() {
         uiState = uiState.copy(contrasena = nuevaContrasena, mensajeError = null)
     }
 
-    fun iniciarSesion(onExito: () -> Unit) {
+    fun iniciarSesion(onExito: (Usuario) -> Unit) {
         if (uiState.correo.isBlank() || uiState.contrasena.isBlank()) {
             uiState = uiState.copy(mensajeError = "Ingresa correo y contraseña")
             return
         }
+        if (uiState.cargando) return
+        uiState = uiState.copy(cargando = true, mensajeError = null)
+        viewModelScope.launch {
+            manejar(auth.iniciarSesion(uiState.correo, uiState.contrasena), onExito)
+        }
+    }
 
-        uiState = uiState.copy(cargando = true)
-        onExito()
+    /** Muestra el error o navega, y siempre apaga el indicador de carga. */
+    private fun manejar(resultado: ResultadoAuth, onExito: (Usuario) -> Unit) {
+        when (resultado) {
+            is ResultadoAuth.Exito -> {
+                uiState = EstadoLoginUI()
+                onExito(resultado.usuario)
+            }
+            is ResultadoAuth.Error -> uiState = uiState.copy(cargando = false, mensajeError = resultado.mensaje)
+        }
     }
 }

@@ -12,7 +12,7 @@ sealed class ResultadoAuth {
 /**
  * Autenticación de usuarios. La UI (Login/Registro) habla con esta abstracción.
  *
- * Implementación LOCAL por ahora; la de Firebase queda pendiente (ver abajo).
+ * Implementaciones: [AuthLocalRepository] (pruebas sin red) y AuthFirebaseRepository.
  */
 interface AuthRepository {
     val usuarioActual: Usuario?
@@ -56,23 +56,4 @@ class AuthLocalRepository : AuthRepository {
     override fun cerrarSesion() { usuarioActual = null }
 }
 
-/**
- * ⚠️ PENDIENTE DE CONEXIÓN A LA BASE DE DATOS (Firebase Auth).
- *
- * Debe envolver FirebaseAuth:
- *  - iniciarSesion -> signInWithEmailAndPassword
- *  - registrar     -> createUserWithEmailAndPassword (+ guardar nombre en perfil/Firestore)
- *  - entrarComoInvitado -> signInAnonymously
- *  - usuarioActual -> FirebaseAuth.getInstance().currentUser
- * Opcionalmente, login con Google mediante GoogleAuthProvider.
- */
-class AuthFirebaseRepository : AuthRepository {
-    override val usuarioActual: Usuario? get() = TODO("FirebaseAuth.currentUser")
-    override suspend fun iniciarSesion(correo: String, contrasena: String): ResultadoAuth =
-        TODO("signInWithEmailAndPassword")
-    override suspend fun registrar(nombre: String, correo: String, contrasena: String): ResultadoAuth =
-        TODO("createUserWithEmailAndPassword")
-    override suspend fun entrarComoInvitado(): ResultadoAuth =
-        TODO("signInAnonymously")
-    override fun cerrarSesion() = TODO("FirebaseAuth.signOut()")
-}
+// La implementación real con Firebase está en AuthFirebaseRepository.kt
