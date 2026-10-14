@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -25,6 +28,7 @@ import com.udistrital.domino.composables.RegistroScreen
 import com.udistrital.domino.composables.ResultadoScreen
 import com.udistrital.domino.composables.SalaEsperaScreen
 import com.udistrital.domino.data.ConfigPartida
+import com.udistrital.domino.data.Usuario
 import com.udistrital.domino.viewmodel.CrearPartidaViewModel
 import com.udistrital.domino.viewmodel.HistorialViewModel
 import com.udistrital.domino.viewmodel.InicioViewModel
@@ -105,21 +109,32 @@ fun AppNavegacion(
     historialViewModel: HistorialViewModel
 ) {
     val navController = rememberNavController()
+    val context = LocalContext.current
+
+    // Si Firebase ya tiene una sesión guardada, se entra directo al Lobby.
+    val usuarioGuardado = remember { inicioViewModel.usuarioActual }
+    LaunchedEffect(usuarioGuardado) {
+        usuarioGuardado?.let { lobbyViewModel.establecerUsuario(it.nombre) }
+    }
+
+    /** Tras autenticarse: guarda el nombre y limpia la pila de navegación. */
+    val irAlLobby: (Usuario) -> Unit = { usuario ->
+        lobbyViewModel.establecerUsuario(usuario.nombre)
+        navController.navigate(Rutas.LOBBY) {
+            popUpTo(Rutas.INICIO) { inclusive = true }
+        }
+    }
 
     NavHost(
         navController = navController,
-        startDestination = Rutas.INICIO
+        startDestination = if (usuarioGuardado != null) Rutas.LOBBY else Rutas.INICIO
     ) {
         // 1. PANTALLA DE INICIO
         composable(Rutas.INICIO) {
             PantallaInicio(
                 onIniciarSesionClick = { navController.navigate(Rutas.LOGIN) },
                 onContinuarInvitadoClick = {
-                    inicioViewModel.onEntrarComoInvitado { _ ->
-                        navController.navigate(Rutas.LOBBY) {
-                            popUpTo(Rutas.INICIO) { inclusive = true }
-                        }
-                    }
+                    inicioViewModel.onEntrarComoInvitado(irAlLobby)
                 },
                 onCrearCuentaClick = { navController.navigate(Rutas.REGISTRO) }
             )
@@ -132,11 +147,10 @@ fun AppNavegacion(
                 onCorreoChange = { loginViewModel.onCorreoChange(it) },
                 onContrasenaChange = { loginViewModel.onContrasenaChange(it) },
                 onIniciarSesionClick = {
-                    loginViewModel.iniciarSesion {
-                        navController.navigate(Rutas.LOBBY) {
-                            popUpTo(Rutas.INICIO) { inclusive = true }
-                        }
-                    }
+                    loginViewModel.iniciarSesion(irAlLobby)
+                },
+                onGoogleClick = {
+                    loginViewModel.iniciarSesionConGoogle(context, irAlLobby)
                 },
                 onVolverInicioClick = { navController.popBackStack() },
                 onIrARegistroClick = {
@@ -156,11 +170,7 @@ fun AppNavegacion(
                 onContrasenaChange = { registroViewModel.onContrasenaChange(it) },
                 onConfirmarContrasenaChange = { registroViewModel.onConfirmarContrasenaChange(it) },
                 onRegistrarClick = {
-                    registroViewModel.registrarUsuario {
-                        navController.navigate(Rutas.LOBBY) {
-                            popUpTo(Rutas.INICIO) { inclusive = true }
-                        }
-                    }
+                    registroViewModel.registrarUsuario(irAlLobby)
                 },
                 onVolverInicioClick = { navController.popBackStack() },
                 onIrALoginClick = {
@@ -216,22 +226,32 @@ fun AppNavegacion(
 
         // 6. SALA DE ESPERA
         composable(Rutas.SALA_ESPERA) {
-            SalaEsperaScreen(
-                state = salaEsperaViewModel.uiState,
-                onComenzar = {
-                    val config = salaEsperaViewModel.configParaIniciar()
-                    if (config != null) {
-                        juegoViewModel.iniciar(config)
-                        navController.navigate(Rutas.JUEGO) {
-                            popUpTo(Rutas.LOBBY) { inclusive = false }
-                        }
+            val estadoSala = salaEsperaViewModel.uiState
+            val irAlJuego: () -> Unit = {
+                val config = salaEsperaViewModel.configParaIniciar()
+                if (config != null) {
+                    juegoViewModel.iniciar(config)
+                    navController.navigate(Rutas.JUEGO) {
+                        popUpTo(Rutas.LOBBY) { inclusive = false }
                     }
-                },
+                }
+            }
+            // Invitado: cuando el anfitrión comienza (estado EN_CURSO en Firestore)
+            // entra solo al tablero.
+            LaunchedEffect(estadoSala.partidaIniciada) {
+                if (estadoSala.partidaIniciada && !estadoSala.esAnfitrion) irAlJuego()
+            }
+            SalaEsperaScreen(
+                state = estadoSala,
+                onComenzar = irAlJuego,
                 onCancelar = {
                     salaEsperaViewModel.cancelar()
                     navController.popBackStack(Rutas.LOBBY, inclusive = false)
                 },
-                onVolver = { navController.popBackStack() }
+                onVolver = {
+                    salaEsperaViewModel.cancelar()
+                    navController.popBackStack()
+                }
             )
         }
 
@@ -269,6 +289,7 @@ fun AppNavegacion(
 
         // 9. HISTORIAL
         composable(Rutas.HISTORIAL) {
+            LaunchedEffect(Unit) { historialViewModel.cargar() }
             HistorialScreen(
                 partidas = historialViewModel.partidas,
                 onVolver = { navController.popBackStack() }

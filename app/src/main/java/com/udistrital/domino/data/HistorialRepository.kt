@@ -15,7 +15,8 @@ data class RegistroPartida(
  * abstracción.
  */
 interface HistorialRepository {
-    fun obtenerHistorial(): List<RegistroPartida>
+    /** suspend porque la versión de Firestore es asíncrona. */
+    suspend fun obtenerHistorial(): List<RegistroPartida>
 }
 
 /**
@@ -23,7 +24,7 @@ interface HistorialRepository {
  * Historial funcionando mientras no hay base de datos.
  */
 class HistorialLocalRepository : HistorialRepository {
-    override fun obtenerHistorial(): List<RegistroPartida> = listOf(
+    override suspend fun obtenerHistorial(): List<RegistroPartida> = listOf(
         RegistroPartida("1", "Carlos", true, 18, 12, "28 sep. 2026"),
         RegistroPartida("2", "Luis", false, 10, 18, "25 sep. 2026"),
         RegistroPartida("3", "María", true, 21, 15, "22 sep. 2026"),
@@ -32,14 +33,4 @@ class HistorialLocalRepository : HistorialRepository {
     )
 }
 
-/**
- * ⚠️ PENDIENTE DE CONEXIÓN A LA BASE DE DATOS (Firebase/Firestore).
- *
- * Debe leer la colección "usuarios/{uid}/partidas" (o similar), ordenada por
- * fecha descendente, y mapear cada documento a [RegistroPartida]. Al terminar
- * cada partida, el JuegoViewModel/repositorio debería escribir aquí el registro.
- */
-class HistorialFirebaseRepository : HistorialRepository {
-    override fun obtenerHistorial(): List<RegistroPartida> =
-        TODO("Leer historial de partidas del usuario desde Firestore")
-}
+// La implementación con Firestore está en HistorialFirebaseRepository.kt

@@ -11,6 +11,11 @@ class LobbyViewModel : ViewModel() {
     var uiState by mutableStateOf(EstadoLobbyUI())
         private set
 
+    /** Muestra en el encabezado el nombre del usuario autenticado. */
+    fun establecerUsuario(nombre: String) {
+        uiState = uiState.copy(nombreUsuario = nombre)
+    }
+
     fun onCodigoChange(nuevoCodigo: String) {
         uiState = uiState.copy(codigoIngreso = nuevoCodigo, mensajeError = null)
     }
