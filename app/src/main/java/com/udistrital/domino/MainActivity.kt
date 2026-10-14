@@ -226,22 +226,32 @@ fun AppNavegacion(
 
         // 6. SALA DE ESPERA
         composable(Rutas.SALA_ESPERA) {
-            SalaEsperaScreen(
-                state = salaEsperaViewModel.uiState,
-                onComenzar = {
-                    val config = salaEsperaViewModel.configParaIniciar()
-                    if (config != null) {
-                        juegoViewModel.iniciar(config)
-                        navController.navigate(Rutas.JUEGO) {
-                            popUpTo(Rutas.LOBBY) { inclusive = false }
-                        }
+            val estadoSala = salaEsperaViewModel.uiState
+            val irAlJuego: () -> Unit = {
+                val config = salaEsperaViewModel.configParaIniciar()
+                if (config != null) {
+                    juegoViewModel.iniciar(config)
+                    navController.navigate(Rutas.JUEGO) {
+                        popUpTo(Rutas.LOBBY) { inclusive = false }
                     }
-                },
+                }
+            }
+            // Invitado: cuando el anfitrión comienza (estado EN_CURSO en Firestore)
+            // entra solo al tablero.
+            LaunchedEffect(estadoSala.partidaIniciada) {
+                if (estadoSala.partidaIniciada && !estadoSala.esAnfitrion) irAlJuego()
+            }
+            SalaEsperaScreen(
+                state = estadoSala,
+                onComenzar = irAlJuego,
                 onCancelar = {
                     salaEsperaViewModel.cancelar()
                     navController.popBackStack(Rutas.LOBBY, inclusive = false)
                 },
-                onVolver = { navController.popBackStack() }
+                onVolver = {
+                    salaEsperaViewModel.cancelar()
+                    navController.popBackStack()
+                }
             )
         }
 
