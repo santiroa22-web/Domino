@@ -5,7 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.udistrital.domino.AppConfig
 import com.udistrital.domino.data.ConfigPartida
+import com.udistrital.domino.data.PartidaFirebaseRepository
 import com.udistrital.domino.data.PartidaLocalRepository
 import com.udistrital.domino.data.PartidaRepository
 import com.udistrital.domino.logica.EstadoJuego
@@ -19,7 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 /**
  * ViewModel central de la partida. Orquesta la interacción del jugador local con
- * el [PartidaRepository] (hoy local; mañana Firebase) y mantiene el estado de
+ * el [PartidaRepository] (Firebase o local según AppConfig) y mantiene el estado de
  * interfaz (ficha seleccionada, modo portal, diálogos).
  *
  * No contiene reglas del juego: todas viven en [MotorDomino]. Aquí solo se
@@ -27,8 +29,11 @@ import kotlinx.coroutines.flow.StateFlow
  */
 class JuegoViewModel : ViewModel() {
 
-    // Para conectar Firebase, basta cambiar esta línea por el repositorio remoto.
-    private val repo: PartidaRepository = PartidaLocalRepository(viewModelScope)
+    // En línea: Firestore en tiempo real. Local: contra la CPU. El resto del
+    // ViewModel, el motor y las pantallas son idénticos en ambos modos.
+    private val repo: PartidaRepository =
+        if (AppConfig.MODO_EN_LINEA) PartidaFirebaseRepository(viewModelScope)
+        else PartidaLocalRepository(viewModelScope)
 
     /** Estado lógico observable de la partida. */
     val estado: StateFlow<EstadoJuego?> = repo.estado
