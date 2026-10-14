@@ -108,11 +108,26 @@ fun SalaEsperaScreen(
 
             Spacer(Modifier.weight(1f))
 
-            if (state.oponenteConectado) {
+            state.mensajeError?.let { error ->
+                Text(
+                    error,
+                    color = Color(0xFFFF5252),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            }
+
+            if (state.oponenteConectado && state.esAnfitrion) {
                 BotonArcadePrincipal(texto = "Comenzar partida", onClick = onComenzar)
             } else {
                 Text(
-                    "Esperando a que se una el oponente...",
+                    when {
+                        state.cargando -> "Conectando con la sala..."
+                        state.oponenteConectado -> "Esperando a que el anfitrión comience..."
+                        else -> "Esperando a que se una el oponente..."
+                    },
                     color = Color.White.copy(alpha = 0.7f),
                     fontSize = 13.sp,
                     modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp),
