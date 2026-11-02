@@ -38,7 +38,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,8 +62,10 @@ fun LobbyScreen(
     onVerPartidasDisponiblesClick: () -> Unit = {},
     onCodigoChange: (String) -> Unit = {},
     onConfirmarUnirseClick: () -> Unit = {},
-    onCerrarDialogoUnirse: () -> Unit = {}
+    onCerrarDialogoUnirse: () -> Unit = {},
+    onCerrarSesion: () -> Unit = {}
 ) {
+    var confirmarSalida by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -115,7 +119,25 @@ fun LobbyScreen(
             }
 
             // 3. BARRA INFERIOR DE NAVEGACIÓN
-            BarraNavegacionInferior()
+            BarraNavegacionInferior(onAjustesClick = { confirmarSalida = true })
+        }
+
+        // Confirmación para cerrar sesión (ícono de ajustes)
+        if (confirmarSalida) {
+            AlertDialog(
+                onDismissRequest = { confirmarSalida = false },
+                title = { Text("Cerrar sesión") },
+                text = { Text("¿Quieres cerrar sesión con ${state.nombreUsuario}?") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        confirmarSalida = false
+                        onCerrarSesion()
+                    }) { Text("Cerrar sesión") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { confirmarSalida = false }) { Text("Cancelar") }
+                }
+            )
         }
 
         // Pop-up para ingresar código de partida
@@ -262,7 +284,7 @@ fun TarjetaMenuArcade(
 }
 
 @Composable
-fun BarraNavegacionInferior() {
+fun BarraNavegacionInferior(onAjustesClick: () -> Unit = {}) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color(0xCC000000)),
         shape = RoundedCornerShape(28.dp),
@@ -280,7 +302,12 @@ fun BarraNavegacionInferior() {
             Icon(imageVector = Icons.Default.Home, contentDescription = "Inicio", tint = AmarilloDorado, modifier = Modifier.size(28.dp))
             Icon(imageVector = Icons.Default.Group, contentDescription = "Historial", tint = Color.White.copy(alpha = 0.5f), modifier = Modifier.size(28.dp))
             Icon(imageVector = Icons.Default.Person, contentDescription = "Perfil", tint = Color.White.copy(alpha = 0.5f), modifier = Modifier.size(28.dp))
-            Icon(imageVector = Icons.Default.Settings, contentDescription = "Ajustes", tint = Color.White.copy(alpha = 0.5f), modifier = Modifier.size(28.dp))
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "Ajustes / cerrar sesión",
+                tint = Color.White.copy(alpha = 0.5f),
+                modifier = Modifier.size(28.dp).clickable { onAjustesClick() }
+            )
         }
     }
 }

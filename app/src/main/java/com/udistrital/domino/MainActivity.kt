@@ -200,7 +200,13 @@ fun AppNavegacion(
                         navController.navigate(Rutas.SALA_ESPERA)
                     }
                 },
-                onCerrarDialogoUnirse = { lobbyViewModel.mostrarDialogoUnirse(false) }
+                onCerrarDialogoUnirse = { lobbyViewModel.mostrarDialogoUnirse(false) },
+                onCerrarSesion = {
+                    inicioViewModel.cerrarSesion()
+                    navController.navigate(Rutas.INICIO) {
+                        popUpTo(0) { inclusive = true } // limpia toda la pila
+                    }
+                }
             )
         }
 
