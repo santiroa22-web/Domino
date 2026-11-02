@@ -1,26 +1,44 @@
 {
   "project_info": {
-    "project_number": "160728195462",
-    "project_id": "domino-kingdom-91ac3",
-    "storage_bucket": "domino-kingdom-91ac3.firebasestorage.app"
+    "project_number": "428616803527",
+    "project_id": "domino-conquista-b019c",
+    "storage_bucket": "domino-conquista-b019c.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:160728195462:android:a44d6ee6b55f6a1921cc07",
+        "mobilesdk_app_id": "1:428616803527:android:e52ed4eb355d25314ecae2",
         "android_client_info": {
           "package_name": "com.udistrital.domino"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "428616803527-avjrv566okutvs533mfjkuajf2sov571.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.udistrital.domino",
+            "certificate_hash": "aa4907cc61461cfd687b483be5919b7c9c4a5f02"
+          }
+        },
+        {
+          "client_id": "428616803527-bfn6nctmf0vvetbd83voifho6ehb5o4d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyBGrTmkwXCkPJ368iSS8jHpYcID1-BOXO4"
+          "current_key": "AIzaSyCXTKrHYw2o8h532HlrL0n8EqnzkU5ti8g"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "428616803527-bfn6nctmf0vvetbd83voifho6ehb5o4d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
