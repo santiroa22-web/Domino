@@ -39,10 +39,6 @@ import com.udistrital.domino.logica.Ficha
 import com.udistrital.domino.logica.Posicion
 import com.udistrital.domino.logica.TipoCasilla
 
-// =====================================================================
-//  COMPONENTES REUTILIZABLES: fichas, casillas, tablero, jugadores
-//  (requisito del taller: "utilizar componentes reutilizables")
-// =====================================================================
 
 /** Orientación con la que se dibuja una ficha de dominó. */
 enum class OrientacionFicha { VERTICAL, HORIZONTAL }
